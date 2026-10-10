@@ -1,0 +1,21 @@
+# Local OS/editor files
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+
+# Local runtime and credentials
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.codex/
+.agents/
+.openai/
+.DS_Store
+Thumbs.db

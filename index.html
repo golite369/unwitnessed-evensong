@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090b0c">
+  <title>无人作证的晚祷 · 第七次钟声 Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="gameShell" aria-label="无人作证的晚祷试玩 Demo">
+    <section id="stage">
+      <img id="sceneBg" src="assets/demo/map_service_route.png" alt="">
+      <canvas id="exploreCanvas" width="1600" height="900" aria-label="修道院跑图区域"></canvas>
+      <div id="vignette"></div>
+      <header id="hud">
+        <div id="chapterLabel">第三章 · 第七次钟声</div>
+        <div id="bellCounter">钟声 Ⅱ / Ⅶ</div>
+        <button id="menuToggle" class="iconButton" type="button">菜单</button>
+        <button id="soundToggle" class="iconButton" type="button">声音：开</button>
+      </header>
+      <div id="objective" class="ornamentBox">前往礼拜堂侧门</div>
+      <div id="mapPrompt" class="ornamentBox hidden">E · 调查</div>
+      <div id="locationCard" class="hidden"><span></span></div>
+      <div id="bellFlash" class="hidden"><strong>第四次钟声</strong><small>钟声比记忆中更近</small></div>
+      <section id="flashbackOverlay" class="hidden" aria-live="polite">
+        <img id="flashbackBg" alt="">
+        <img id="flashbackFigure" class="hidden" alt="">
+        <div class="flashbackGrain"></div>
+        <p id="flashbackTime"></p>
+        <div class="flashbackCopy"><p id="flashbackCaption"></p><small id="flashbackLine"></small></div>
+        <button id="flashbackSkip" type="button">继续</button>
+      </section>
+      <div id="portraitLayer" aria-hidden="true">
+        <img id="portraitLeft" class="portrait left" alt="">
+        <img id="portraitRight" class="portrait right" alt="">
+      </div>
+      <section id="dialogueBox" class="hidden" aria-live="polite">
+        <div id="speakerName">伊蕾娜</div>
+        <p id="dialogueText"></p>
+        <div id="continueMark">◆</div>
+      </section>
+      <section id="choiceOverlay" class="modalPanel choicePanel hidden" aria-live="polite">
+        <p id="choiceEyebrow" class="eyebrow">决定下一步</p>
+        <h2 id="choiceTitle">你要先做什么？</h2>
+        <div id="choiceList"></div>
+      </section>
+      <section id="qtePanel" class="modalPanel qtePanel hidden" aria-live="assertive">
+        <p class="eyebrow">第七声之后 · 限时决定</p>
+        <h2>赫尔曼正在替伤员补完答案</h2>
+        <div id="qteChoices"></div>
+        <i id="qteMeter"></i>
+      </section>
+      <section id="evidenceOverlay" class="modalPanel hidden">
+        <h2>选择证物</h2><p>用未经引导的记录重新提问</p>
+        <button id="recordEvidence" type="button">
+          <img src="assets/generated/props/evidence_medical_records.png" alt="医疗记录">
+          <span><b>医疗记录</b><small>按 1 使用</small></span>
+        </button>
+      </section>
+      <section id="morseOverlay" class="modalPanel hidden">
+        <p class="eyebrow">第七次钟声后的敲击</p><h2>辨认信号</h2>
+        <div id="morseCode">· · ·</div><div id="morseReveal">_ _ _ / _ _ _</div>
+        <button id="morseTap" class="choiceButton" type="button">记录下一组</button><small>按空格或点击按钮</small>
+      </section>
+      <section id="menuOverlay" class="systemOverlay hidden" aria-label="游戏菜单">
+        <div class="systemWindow menuWindow">
+          <div class="systemHeading">
+            <div><p>PAUSE MENU</p><h2>游戏菜单</h2></div>
+            <button id="menuClose" class="closeButton" type="button" aria-label="关闭菜单">×</button>
+          </div>
+          <div class="menuLayout">
+            <nav class="menuNav" aria-label="菜单选项">
+              <button id="resumeGame" class="menuEntry" type="button"><span>继续游戏</span><small>返回当前场景</small></button>
+              <button id="openInventory" class="menuEntry" type="button"><span>背包</span><small>查看已收集证物</small></button>
+              <button id="menuSound" class="menuEntry" type="button"><span>声音：开</span><small>切换钟声与环境音</small></button>
+              <button id="restartFromMenu" class="menuEntry" type="button"><span>重新开始</span><small>从医务室重新游玩</small></button>
+              <button id="returnToTitle" class="menuEntry subdued" type="button"><span>返回标题</span><small>结束本次进度</small></button>
+            </nav>
+            <aside class="menuSummary">
+              <p class="eyebrow">当前章节</p>
+              <h3>第三章 · 第七次钟声</h3>
+              <div class="summaryRule"></div>
+              <p id="menuObjective">礼拜堂提前开始了</p>
+              <dl><div><dt>钟声</dt><dd id="menuBell">Ⅱ / Ⅶ</dd></div><div><dt>证物</dt><dd id="menuInventoryCount">1 / 4</dd></div></dl>
+              <div class="investigationStatus" aria-label="调查状态">
+                <p class="eyebrow">调查状态</p>
+                <div><span>推理 <b id="statReason">0</b></span><span>共情 <b id="statEmpathy">0</b></span><span>控场 <b id="statControl">0</b></span></div>
+              </div>
+              <div class="caseRecord"><p class="eyebrow">案件记录</p><p id="caseRecordText">尚未得到足以记录的答案。</p></div>
+              <p class="menuHint">Esc 打开或关闭菜单　I 直接打开背包</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+      <section id="inventoryOverlay" class="systemOverlay hidden" aria-label="证物背包">
+        <div class="systemWindow inventoryWindow">
+          <div class="systemHeading">
+            <div><p>EVIDENCE INVENTORY</p><h2>证物背包</h2></div>
+            <button id="inventoryClose" class="closeButton" type="button" aria-label="关闭背包">×</button>
+          </div>
+          <div class="inventoryLayout">
+            <div id="inventoryGrid" class="inventoryGrid"></div>
+            <aside id="itemDetail" class="itemDetail">
+              <p class="eyebrow">当前证物</p>
+              <h3>医疗记录</h3>
+              <p>从医务室带出的 B-17 病历。部分段落遭到涂改，仍保留着“第七声之后”的记录。</p>
+              <small>点击左侧证物查看详情</small>
+            </aside>
+          </div>
+        </div>
+      </section>
+      <section id="introCover" class="introCover" aria-label="游戏入场封面">
+        <img class="introCoverImage" src="assets/demo/title_cover_original.png" alt="无人作证的晚祷原版封面">
+        <div class="introSnow introSnowFar" aria-hidden="true"></div>
+        <div class="introSnow introSnowNear" aria-hidden="true"></div>
+        <div class="introShade" aria-hidden="true"></div>
+        <nav class="coverMenu" aria-label="封面菜单">
+          <button id="coverStart" class="coverHotspot coverStart" type="button" aria-label="开始游戏"><span>开始游戏</span></button>
+          <button id="coverContinue" class="coverHotspot coverContinue" type="button" aria-label="继续游戏"><span>继续游戏</span></button>
+          <button id="coverSave" class="coverHotspot coverSave" type="button" aria-label="查看存档"><span>存档</span></button>
+          <button id="coverSettings" class="coverHotspot coverSettings" type="button" aria-label="声音设置"><span>设置</span></button>
+          <button id="coverExit" class="coverHotspot coverExit" type="button" aria-label="退出说明"><span>退出</span></button>
+        </nav>
+        <div id="introNotice" class="introNotice hidden" role="status" aria-live="polite">
+          <span></span>
+        </div>
+      </section>
+      <section id="startScreen" class="fullScreen">
+        <div class="titleBlock">
+          <p>第三章 · 可玩片段</p><h1>无人作证的晚祷</h1><h2>第七次钟声</h2><div class="titleRule"></div>
+          <button id="startButton" class="menuButton" type="button">开始试玩</button>
+          <p class="controlsHint">WASD / 方向键移动　Shift 跑步　E 调查　点击 / 空格继续</p><p class="note">约 6—8 分钟 · 选择会影响调查方式与答案</p>
+        </div>
+      </section>
+      <section id="endScreen" class="fullScreen hidden">
+        <div class="titleBlock end">
+          <p id="endLead">本轮调查得到的答案</p><h1 id="endKeyword">维克多。</h1><p id="endAnswer" class="endAnswer"></p><div class="titleRule"></div>
+          <button id="endInventoryButton" class="menuButton secondary" type="button">查看背包</button>
+          <button id="restartButton" class="menuButton" type="button">重新开始</button>
+        </div>
+      </section>
+      <div id="mobileControls" aria-label="触屏控制">
+        <button data-key="ArrowLeft" type="button">◀</button><button data-key="ArrowRight" type="button">▶</button>
+        <button data-key="ShiftLeft" type="button">跑</button><button data-key="KeyE" type="button">调查</button>
+      </div>
+    </section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
